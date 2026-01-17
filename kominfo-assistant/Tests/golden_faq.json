@@ -1,0 +1,102 @@
+[
+  {
+    "q": "Bagaimana jika kami ingin mengetahui metadata anak tidak sekolah (ATS) pada kegiatan kompilasi data program Rindu Bulan Kabupaten Banyuwangi?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "JDIH",
+      "download"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/6e171b05c9a80c8fd41a1f9f69abe9e0.pdf"
+    ]
+  },
+  {
+    "q": "Bagaimana jika kami ingin mengetahui metadata hasil skrining penyakit tidak menular (PTM) pada kegiatan kompilasi data program Kampung Cerdik Kabupaten Banyuwangi?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "JDIH",
+      "download"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/48481ae712f739a846137f06c7c8adee.pdf"
+    ]
+  },
+  {
+    "q": "Bagaimana jika kami ingin mengetahui jadwal rilis data statistik yang terdapat di Banyuwangi Satu Data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "download"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/Berita_Acara_Forum_Data_2023.pdf"
+    ]
+  },
+  {
+    "q": "Bagaimana jika kami ingin mengetahui agenda pelaksanaan kegiatan statistik yang terdapat di Banyuwangi Satu Data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "download"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/Agenda_Pelaksanaan_Kegiatan_Statistik_2023.pdf"
+    ]
+  },
+  {
+    "q": "Bagaimana jika kami ingin mengetahui secara singkat dan ringkas terkait Website Banyuwangi Satu Data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "unduh"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/Buku_Panduan_Banyuwangi_Satu_Data.pdf"
+    ]
+  },
+  {
+    "q": "Apakah Kabupaten Banyuwangi telah memiliki SOP terkait data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "SOP",
+      "unduh"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/SOP_STATISTIK_2023.pdf"
+    ]
+  },
+  {
+    "q": "Apakah Kabupaten Banyuwangi telah memiliki peraturan terkait pengelolaan data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "Peraturan",
+      "unduh"
+    ],
+    "must_mention_urls": [
+      "https://satudata.banyuwangikab.go.id/faq/download/Peraturan_Bupati_Banyuwangi_No._6_Tahun_2021_tentang_Pengelolaan_Data_di_Lingkup_Pemrintah_Kabupaten_Banyuwangi_.pdf"
+    ]
+  },
+  {
+    "q": "Apakah data yang ditampilkan pada Portal Satu Data Banyuwangi dapat dipercaya?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "verifikasi",
+      "validasi"
+    ],
+    "must_mention_urls": []
+  },
+  {
+    "q": "Apa langkah selanjutnya jika kami telah melakukan Request Data?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "request data",
+      "email"
+    ],
+    "must_mention_urls": []
+  },
+  {
+    "q": "Bagaimana jika data yang saya cari tidak tersedia pada Portal Satu Data Banyuwangi?",
+    "expect_mode": "faq",
+    "must_contain": [
+      "request data"
+    ],
+    "must_mention_urls": []
+  }
+]

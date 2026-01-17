@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "data_version": "0.1.0",
+    "updated_by": "bootstrap",
+    "updated_at": "2026-01-08"
+  },
+  "units": [
+    {
+      "id": "dinkominfo",
+      "name": "Dinas Komunikasi, Informatika dan Persandian Kabupaten Banyuwangi",
+      "parent_id": null,
+      "tasks": [
+        "Mengelola layanan informasi dan komunikasi pemerintah daerah",
+        "Mengelola layanan TIK/SPBE serta dukungan persandian sesuai kewenangan daerah"
+      ],
+      "contact_ids": []
+    }
+  ]
+}

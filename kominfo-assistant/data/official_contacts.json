@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "data_version": "0.1.0",
+    "updated_by": "bootstrap",
+    "updated_at": "2026-01-08"
+  },
+  "contacts": [
+    {
+      "id": "bsd_alamat",
+      "type": "alamat",
+      "label": "Alamat",
+      "value": "Jl. K.H. Agus Salim No.85, Taman Baru, Kec. Banyuwangi, Kabupaten Banyuwangi, Jawa Timur 68416",
+      "source_url": "(offline html export)",
+      "last_verified_date": "2026-01-08",
+      "notes": ""
+    },
+    {
+      "id": "bsd_tel",
+      "type": "tel",
+      "label": "Telepon",
+      "value": "(0333) 424972",
+      "source_url": "(offline html export)",
+      "last_verified_date": "2026-01-08",
+      "notes": ""
+    },
+    {
+      "id": "bsd_email",
+      "type": "email",
+      "label": "Email",
+      "value": "statistikdansandi@gmail.com",
+      "source_url": "(offline html export)",
+      "last_verified_date": "2026-01-08",
+      "notes": ""
+    },
+    {
+      "id": "bsd_twitter",
+      "type": "website",
+      "label": "Twitter",
+      "value": "https://twitter.com/databwi",
+      "source_url": "(offline html export)",
+      "last_verified_date": "2026-01-08",
+      "notes": ""
+    },
+    {
+      "id": "bsd_instagram_link",
+      "type": "website",
+      "label": "Instagram (link)",
+      "value": "https://www.instagram.com/accounts/login/?next=/databwi/",
+      "source_url": "(offline html export)",
+      "last_verified_date": "2026-01-08",
+      "notes": "Verifikasi handle IG sebelum ditulis sebagai @..."
+    }
+  ]
+}

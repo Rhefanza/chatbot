@@ -1,0 +1,97 @@
+[
+  {
+    "no": 1,
+    "pertanyaan": "Bagaimana jika kami ingin mengetahui metadata anak tidak sekolah (ATS) pada kegiatan kompilasi data program Rindu Bulan Kabupaten Banyuwangi?",
+    "jawaban": "Informasi tersebut dapat diakses melalui website JDIH Kabupaten Banyuwangi atau dapat didownload di sini                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/6e171b05c9a80c8fd41a1f9f69abe9e0.pdf"
+      }
+    ]
+  },
+  {
+    "no": 2,
+    "pertanyaan": "Bagaimana jika kami ingin mengetahui metadata hasil skrining penyakit tidak menular (PTM) pada kegiatan kompilasi data program Kampung Cerdik Kabupaten Banyuwangi?",
+    "jawaban": "Informasi tersebut dapat diakses melalui website JDIH Kabupaten Banyuwangi atau dapat didownload di sini                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/48481ae712f739a846137f06c7c8adee.pdf"
+      }
+    ]
+  },
+  {
+    "no": 3,
+    "pertanyaan": "Bagaimana jika kami ingin mengetahui jadwal rilis data statistik yang terdapat di Banyuwangi Satu Data?",
+    "jawaban": "Terdapat jadwal rilis data statistik yang dapat didownload disini\n File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/Berita_Acara_Forum_Data_2023.pdf"
+      }
+    ]
+  },
+  {
+    "no": 4,
+    "pertanyaan": "Bagaimana jika kami ingin mengetahui agenda pelaksanaan kegiatan statistik yang terdapat di Banyuwangi Satu Data?",
+    "jawaban": "Terdapat agenda pelaksanaan kegiatan statistik yang dapat didownload disini                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/Agenda_Pelaksanaan_Kegiatan_Statistik_2023.pdf"
+      }
+    ]
+  },
+  {
+    "no": 5,
+    "pertanyaan": "Bagaimana jika kami ingin mengetahui secara singkat dan ringkas terkait Website Banyuwangi Satu Data?",
+    "jawaban": "Terdapat Buku Panduan atau Manual Book yang dapat dipelajari Terkait Banyuwangi Satu Data yang dapat diunduh pada tautan berikut ini                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/Buku_Panduan_Banyuwangi_Satu_Data.pdf"
+      }
+    ]
+  },
+  {
+    "no": 6,
+    "pertanyaan": "Apakah Kabupaten Banyuwangi telah memiliki SOP terkait data?",
+    "jawaban": "Kabupaten Banyuwangi telah memiliki SOP terkait Data, untuk lebih lengkapnya Anda dapat mengunduh pada tautan berikut.                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/SOP_STATISTIK_2023.pdf"
+      }
+    ]
+  },
+  {
+    "no": 7,
+    "pertanyaan": "Apakah Kabupaten Banyuwangi telah memiliki peraturan terkait pengelolaan data?",
+    "jawaban": "Kabupaten Banyuwangi telah memiliki Peraturan Bupati terkait Pengelolaan Data, untuk lebih lengkapnya Anda dapat mengunduh pada tautan berikut.                                  \n                                \n                                                                   File",
+    "lampiran_file": [
+      {
+        "nama_file": "File",
+        "url": "https://satudata.banyuwangikab.go.id/faq/download/Peraturan_Bupati_Banyuwangi_No._6_Tahun_2021_tentang_Pengelolaan_Data_di_Lingkup_Pemrintah_Kabupaten_Banyuwangi_.pdf"
+      }
+    ]
+  },
+  {
+    "no": 8,
+    "pertanyaan": "Apakah data yang ditampilkan pada Portal Satu Data Banyuwangi dapat dipercaya?",
+    "jawaban": "Setiap data yang Kami tampilkan pada Portal Satu Data Banyuwangi telah melalui proses verifikasi dan validasi oleh Produsen Data dan Wali Data.",
+    "lampiran_file": []
+  },
+  {
+    "no": 9,
+    "pertanyaan": "Apa langkah selanjutnya jika kami telah melakukan Request Data?",
+    "jawaban": "Setelah melakukan Request Data, Admin akan menghubungi anda terkait ketersediaan data, atau silahkan cek email secara berkala.",
+    "lampiran_file": []
+  },
+  {
+    "no": 10,
+    "pertanyaan": "Bagaimana jika data yang saya cari tidak tersedia pada Portal Satu Data Banyuwangi?",
+    "jawaban": "Jika data yang anda cari tidak tersedia pada Portal kami, silahkan melakukan request data pada menu Request Data.",
+    "lampiran_file": []
+  }
+]
