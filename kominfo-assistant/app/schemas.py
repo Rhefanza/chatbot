@@ -34,4 +34,10 @@ class DirectoryAnswer(BaseModel):
     citations: List[str] = []
     followups: List[str] = []
 
+from pydantic import BaseModel
+from typing import Optional, List
+
+class ChatIn(BaseModel):
+    message: str
+    session_id: Optional[str] = None
 

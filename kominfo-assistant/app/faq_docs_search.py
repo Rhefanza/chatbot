@@ -128,19 +128,28 @@ def is_bad_chunk(text: str) -> bool:
         return True
     if re.search(r"\.{10,}", text):
         return True
-    if text.strip().upper().startswith("BAB "):
+
+    t = (text or "").strip()
+
+    # ✅ FIX: buang chunk BAB walau diawali angka, mis. "6 BAB II ..."
+    if re.match(r"^\s*\d*\s*BAB\b", t, flags=re.I):
         return True
 
-    # Buang chunk yang tampak seperti daftar dokumen/lampiran:
-    # contoh: "7. Pedoman ... 8. SOP ... 9. SOP ..."
+    # ✅ juga buang kalau BAB muncul di awal banget (kadang ada nomor/karakter dulu)
+    if re.search(r"^\s*.{0,12}\bBAB\b", t, flags=re.I):
+        return True
+
+    # buang chunk yang tampak seperti daftar dokumen/lampiran
     if len(re.findall(r"\b\d+\.\s", text)) >= 3:
         return True
-    if len(re.findall(r"\bSOP\b", text, flags=re.I)) >= 3:
+
+    if len(re.findall(r"\bSOP\b", text, re.I)) >= 3:
         return True
-    if len(re.findall(r"\bPedoman\b", text, flags=re.I)) >= 3:
+    if len(re.findall(r"\bPedoman\b", text, re.I)) >= 3:
         return True
 
     return False
+
 
 def filter_hits_allowed_docs(
     hits: List[Tuple[float, Dict[str, Any]]],
@@ -508,26 +517,57 @@ def detect_yes_no_regulation(question: str, hits: List[Tuple[float, Dict[str, An
     if not re.search(r"\b(peraturan|perbup|pedoman|aturan)\b", q):
         return None
 
+    # kata kunci domain agar tidak asal "iya" hanya karena ada kata peraturan
+    domain_terms = [
+        "pengelolaan data", "satu data", "portal data",
+        "walidata", "produsen data", "metadata", "standar data"
+    ]
+
     for _, ch in hits[:8]:
         tl = (ch.get("text") or "").lower()
-        if ("peraturan bupati" in tl and "pengelolaan data" in tl):
+
+        has_reg = ("peraturan bupati" in tl) or ("perbup" in tl) or re.search(r"\bperaturan\b", tl) is not None
+        has_domain = any(t in tl for t in domain_terms)
+
+        # ✅ kuat: eksplisit "pengelolaan data"
+        if "peraturan bupati" in tl and "pengelolaan data" in tl:
             return "Iya. Kabupaten Banyuwangi memiliki peraturan terkait pengelolaan data."
-        if re.search(r"nomor\s+6\s+tahun\s+2021", tl) and "pengelolaan data" in tl:
+
+        # ✅ kuat: nomor peraturan spesifik + domain
+        if re.search(r"nomor\s+6\s+tahun\s+2021", tl) and ("pengelolaan data" in tl or has_domain):
             return "Iya. Kabupaten Banyuwangi memiliki peraturan terkait pengelolaan data."
+
+        # ✅ moderat: ada peraturan/perbup + konteks Satu Data/pengelolaan data
+        if has_reg and has_domain:
+            return "Iya. Dari cuplikan dokumen yang ditemukan, ada peraturan/perbup yang terkait pengelolaan data."
+
     return None
+
 
 def detect_yes_no_sop(question: str, hits: List[Tuple[float, Dict[str, Any]]]) -> Optional[str]:
     q = (question or "").lower()
     if not re.search(r"\b(apakah|ada(kah)?|sudah|telah|memiliki)\b", q):
         return None
-    if not re.search(r"\b(sop)\b", q):
+    if not re.search(r"\bsop\b", q):
         return None
 
+    # domain guard supaya tidak false positive
+    domain_terms = [
+        "data", "statistik", "metadata", "walidata", "produsen",
+        "satu data", "kompilasi", "validasi", "verifikasi", "indikator", "permintaan data"
+    ]
+
     for _, ch in hits[:8]:
-        doc = _doc_name(ch)
+        doc = (_doc_name(ch) or "").lower()
         tl = (ch.get("text") or "").lower()
-        if "sop" in doc or "sop" in tl:
-            return "Iya. Dari cuplikan dokumen yang ditemukan, Kabupaten Banyuwangi memiliki SOP terkait data."
+
+        has_sop = ("sop" in doc) or re.search(r"\bsop\b", tl) is not None
+        has_domain = any(t in tl for t in domain_terms) or any(t.replace(" ", "_") in doc for t in domain_terms)
+
+        # ✅ baru klaim "iya" kalau SOP + domain nyambung
+        if has_sop and has_domain:
+            return "Iya. Dari cuplikan dokumen yang ditemukan, Kabupaten Banyuwangi memiliki SOP terkait data/statistik."
+
     return None
 
 # ============================================================
@@ -571,14 +611,38 @@ def answer_faq_doc_llm(
     out = _normalize_llm_output((llm.generate(prompt) or ""))
     print("[llm] raw_out:", repr(out[:600]))
 
+    if out.strip().upper() == "TIDAK RELEVAN":
+        return DirectoryAnswer(
+            mode="not_found",
+            answer="TIDAK RELEVAN",
+            citations=[],
+            followups=[],
+        )
     parsed = _parse_labeled_bullets(out, max_bullets=max_bullets)
     print("[llm] parsed:", parsed)
+# Jika model menjawab TIDAK RELEVAN (tanpa bullet), jangan retry,
+# langsung dianggap "not_found" supaya bisa fallback ke rule/raw.
+    if out.strip().upper() == "TIDAK RELEVAN":
+        return DirectoryAnswer(
+            mode="not_found",
+            answer="LLM menyatakan tidak relevan dengan cuplikan dokumen.",
+            citations=[],
+            followups=[],
+        )
 
     if needs_retry(parsed):
         prompt2 = SUMMARY_RETRY_PROMPT.format(question=question, context=context)
         out2 = _normalize_llm_output((llm.generate(prompt2) or ""))
         print("[llm] retry_out:", repr(out2[:600]))
 
+        if out2.strip().upper() == "TIDAK RELEVAN":
+            return DirectoryAnswer(
+                mode="not_found",
+                answer="TIDAK RELEVAN",
+                citations=[],
+                followups=[],
+            )
+        
         parsed2 = _parse_labeled_bullets(out2, max_bullets=max_bullets)
         print("[llm] retry_parsed:", parsed2)
         if parsed2:
@@ -618,7 +682,7 @@ def answer_faq_doc_llm(
                 mode="faq_doc",
                 answer="Berikut ringkasan berdasarkan dokumen resmi:\n\n- " + txt,
                 citations=[cite_map[idx - 1]] if cite_map and idx - 1 < len(cite_map) else [],
-                followups=["Mau saya ambil rincian langkah berikutnya atau peran aktor terkait?"],
+                followups=[],
             )
 
     if not bullets:
@@ -634,7 +698,7 @@ def answer_faq_doc_llm(
         mode="faq_doc",
         answer="Berikut ringkasan berdasarkan dokumen resmi:\n\n" + "\n".join(bullets),
         citations=citations,
-        followups=["Jika perlu, sebut bagian yang dicari (mis. 'tujuan', 'definisi', 'alur', 'syarat')."],
+        followups=[],
     )
 
 # ============================================================
@@ -668,9 +732,11 @@ def answer_faq_doc_raw(
 ) -> DirectoryAnswer:
     print(">>> ENTER answer_faq_doc_raw <<<")
 
-    q_clean, hits = faq_docs_index.search(expand_query_for_intent_words(question), top_k=top_k)
+    # ✅ kalau ada allowed_docs, ambil kandidat lebih banyak dulu, baru di-scope
+    k = max(top_k, 200) if allowed_docs else top_k
+    q_clean, hits = faq_docs_index.search(expand_query_for_intent_words(question), top_k=k)
 
-    # ✅ scope by allowed docs
+    # ✅ scope by allowed docs (sedini mungkin)
     hits = filter_hits_allowed_docs(hits, allowed_docs)
 
     hits = rerank_hits_for_question(question, hits)
@@ -679,7 +745,10 @@ def answer_faq_doc_raw(
     hits = filter_hits_by_query_overlap(question, hits, min_hits=2)
 
     # ✅ dedup cuplikan agar tidak 3x sama
-    hits = dedup_hits_by_text(hits, max_keep=max(8, top_k))
+    hits = dedup_hits_by_text(hits, max_keep=max(30, top_k))
+
+    # ✅ scope lagi (aman kalau ada perubahan urutan/isi hit)
+    hits = filter_hits_allowed_docs(hits, allowed_docs)
 
     # yes/no SOP dulu (kalau relevan)
     yn_sop = detect_yes_no_sop(question, hits)
@@ -690,7 +759,7 @@ def answer_faq_doc_raw(
             mode="faq_doc",
             answer=yn_sop + "\n\nBukti (cuplikan):\n" + answer_text,
             citations=cites,
-            followups=["Mau saya ambil bagian tujuan SOP, alur/prosedur, atau peran Walidata/Produsen Data?"],
+            followups=[],
         )
 
     yn_reg = detect_yes_no_regulation(question, hits)
@@ -701,7 +770,7 @@ def answer_faq_doc_raw(
             mode="faq_doc",
             answer=yn_reg + "\n\nBukti (cuplikan):\n" + answer_text,
             citations=cites,
-            followups=["Mau saya ambil Pasal tentang ruang lingkup, peran Walidata, atau standar data?"],
+            followups=[],
         )
 
     if not hits:
@@ -718,5 +787,5 @@ def answer_faq_doc_raw(
         mode="faq_doc",
         answer=answer_text,
         citations=cites,
-        followups=["Sebut kata kunci spesifik untuk mempersempit."],
+        followups=[],
     )

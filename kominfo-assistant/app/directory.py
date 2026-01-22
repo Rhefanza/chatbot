@@ -1,8 +1,11 @@
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Tuple
+
 from .schemas import Contact, OrgUnit
 from app.site_help import detect_feature_intent
+
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
@@ -21,10 +24,9 @@ def load_units() -> Dict[str, OrgUnit]:
     units = [OrgUnit(**u) for u in raw.get("units", [])]
     return {u.id: u for u in units}
 
-
-
 CONTACT_KEYWORDS = {
     "ig": ["ig", "instagram"],
+    "twitter": ["twitter", "x"],
     "wa": ["wa", "whatsapp", "whatssapp", "w.a"],
     "email": ["email", "e-mail", "surel"],
     "tel": ["telp", "telepon", "phone", "kontak", "nomor"],
@@ -35,17 +37,16 @@ CONTACT_KEYWORDS = {
 }
 
 
-# app/directory.py (atau tempat detect_intent)
-import re
-
 # Kontak harus eksplisit (jangan pernah pakai kata umum seperti "data", "apakah", "bisa", dll)
 CONTACT_RE = re.compile(
     r"\b("
     r"kontak|contact|hubungi|"
-    r"email|e-mail|mail|"
+    r"email|e-mail|mail|surel|"
     r"telepon|telp|telfon|no\.?\s*hp|nomor|hp|"
     r"wa|whatsapp|"
     r"ig|instagram|"
+    r"twitter|x|"
+    r"facebook|fb|"
     r"alamat|lokasi|maps|"
     r"jam layanan|jam kerja"
     r")\b",
@@ -78,40 +79,41 @@ FAQ_DOC_RE = re.compile(
 )
 
 DATASET_RE = re.compile(
-    r"\b(dataset|katalog dataset|judul dataset|tema dataset|indikator)\b",
+    r"\b(dataset|data|katalog dataset|judul dataset|tema dataset|indikator)\b",
     re.I
 )
+
 
 def detect_intent(text: str) -> str:
     t = (text or "").strip()
     tl = t.lower()
-    is_feat, _ = detect_feature_intent(text)
-    
-    if is_feat:
-        return "site_help"
 
-    # 0) GENERAL INFO (pertanyaan awam)
-    # contoh: "data bwi itu apa", "banyuwangi satu data itu apa", "apa itu satu data"
-    if ("apa itu" in tl) or ("itu apa" in tl) or ("data bwi" in tl) or ("banyuwangi satu data" in tl):
-        return "general_info"
-
-    # 1) ORG
-    if ORG_RE.search(t):
-        return "org_structure"
-
-    # 2) CONTACT (harus eksplisit)
+    # 1) CONTACT harus menang dulu (biar email/ig/twitter/alamat tidak nyasar ke site_help atau doc)
     if CONTACT_RE.search(t):
         return "contact_lookup"
 
-    # 3) DATASET (naikkan prioritas sebelum FAQ)
+    # 2) ORG
+    if ORG_RE.search(t):
+        return "org_structure"
+
+    # 3) DATASET (naikkan prioritas sebelum site_help/FAQ)
     if DATASET_RE.search(t) or tl.startswith("dataset ") or ("dataset" in tl):
         return "dataset_search"
 
-    # 4) FAQ_DOC (kalau query jelas minta dokumen regulasi)
+    # 4) SITE HELP: hanya setelah kontak/dataset/org lolos dulu
+    is_feat, _ = detect_feature_intent(text)
+    if is_feat:
+        return "site_help"
+
+    # 5) GENERAL INFO (pertanyaan awam)
+    if ("apa itu" in tl) or ("itu apa" in tl) or ("data bwi" in tl) or ("banyuwangi satu data" in tl):
+        return "general_info"
+
+    # 6) FAQ_DOC (kalau query jelas minta dokumen regulasi)
     if FAQ_DOC_RE.search(t):
         return "faq_doc"
 
-    # 5) FAQ (pertanyaan layanan / trust / prosedur portal)
+    # 7) FAQ (pertanyaan layanan / trust / prosedur portal)
     if FAQ_RE.search(t):
         return "faq"
 
@@ -119,11 +121,21 @@ def detect_intent(text: str) -> str:
 
 
 def pick_contact_types(text: str) -> List[str]:
-    t = text.lower()
-    types = []
+    """
+    Perbaikan penting:
+    - Jangan pakai `if k in t` karena 'ig' bisa nyangkut di kata lain (mis. "tinggi").
+    - Pakai regex word-boundary agar hanya match token yang benar.
+    """
+    t = (text or "").lower()
+    types: List[str] = []
+
     for ctype, kws in CONTACT_KEYWORDS.items():
-        if any(k in t for k in kws):
-            types.append(ctype)
+        for k in kws:
+            # boundary aman untuk token pendek seperti "ig", "wa"
+            if re.search(rf"(?<!\w){re.escape(k)}(?!\w)", t):
+                types.append(ctype)
+                break
+
     return types
 
 
@@ -145,7 +157,27 @@ def answer_contact(text: str, contacts_by_id: Dict[str, Contact]) -> Tuple[str, 
     if not requested_types:
         selected = all_contacts
     else:
-        selected = [c for c in all_contacts if c.type in requested_types]
+        req = {x.lower().strip() for x in requested_types}
+        selected = []
+
+        for c in all_contacts:
+            ctype = (c.type or "").lower().strip()
+            clabel = (c.label or "").lower().strip()
+
+            # match normal berdasarkan type
+            if ctype in req:
+                selected.append(c)
+                continue
+
+            # fallback: data IG/Twitter kamu saat ini bertipe "website"
+            if ctype == "website":
+                if ("ig" in req) and ("instagram" in clabel):
+                    selected.append(c)
+                    continue
+                if ("twitter" in req) and ("twitter" in clabel):
+                    selected.append(c)
+                    continue
+
 
     if not selected:
         return (
